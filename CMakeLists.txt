@@ -10,3 +10,8 @@ target_link_libraries(serialnum atcore)
 add_executable(listcam listdevices/main.cpp)
 target_link_libraries(listcam atcore)
 
+#add_executable(reconnect reconnect/main.cpp)
+#target_link_libraries(reconnect atcore)
+
+add_executable(live live/live.cpp)
+target_link_libraries(live atcore)
