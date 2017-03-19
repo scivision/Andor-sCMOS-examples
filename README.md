@@ -19,7 +19,7 @@ step 4 is necessary because not all compilers understand how to link the `.dll` 
 
         rename atcorem.lib atcore.lib
         rename atutilitym.lib atutility.lib
-5. 3. copy from `c:/Program Files/Andor SDK3/` directory into `andor-scmos-examples/include/` the files
+5. copy from `c:/Program Files/Andor SDK3/` directory into `andor-scmos-examples/include/` the files
 
         atcore.h
         atutility.h
@@ -32,7 +32,11 @@ Other Linux versions would likely work as well.
 
 1. clone this repository
 2. [install Andor SDK3 for Linux](https://www.scivision.co/andor-neo-linux-sdk3-install/)
-3. install Cmake & Make
+3. copy from `inc/` of the `andor-sdk3*.tgz` into `andor-scmos-examples/include/` the files
+
+        atcore.h
+        atutility.h
+4. install Cmake & Make
 
         sudo apt install cmake make g++
 
