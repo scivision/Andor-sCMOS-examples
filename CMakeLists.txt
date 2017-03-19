@@ -7,3 +7,6 @@ link_directories(lib/)
 add_executable(serialnum serialnumber/serialnumber.cpp)
 target_link_libraries(serialnum atcore)
 
+add_executable(listcam listdevices/main.cpp)
+target_link_libraries(listcam atcore)
+
