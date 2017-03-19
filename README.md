@@ -52,7 +52,7 @@ from the `andor-cmos-examples` directory
 ### Window compile
 
     cmake -G "MinGW Makefiles" .
-    make
+    mingw32-make
 
 this creates executable in the same top-level directory.
 If you don't have a camera, the SimCam will be used.
