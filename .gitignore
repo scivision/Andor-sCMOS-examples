@@ -1,3 +1,7 @@
+listcam
+serialnum
+live
+
 *.bmp
 atcore.h
 atutility.h
