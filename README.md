@@ -44,7 +44,14 @@ Other Linux versions would likely work as well.
 
 from the `andor-cmos-examples` directory
 
+### Linux compile
+
     cmake .
+    make
+
+### Window compile
+
+    cmake -G "MinGW Makefiles" .
     make
 
 this creates executable in the same top-level directory.
