@@ -17,14 +17,14 @@ from subprocess import check_call
 from scipy.ndimage import imread
 from scipy.misc import imsave
 
-root = Path(__file__).parents[1]
+root = Path(__file__).parent
 
 EXP_SEC = 1. #exposure
 I_MIN = 100 # intensity minimum for scaling to 8 bit
 I_MAX = 5000 # intensity maximum for scaling to 8 bit -- will saturate on bright aurora!
 
-FIN = 'image.bmp'
-FOUT = 'latest.jpg'
+FIN = root/'image.bmp'
+FOUT = root/'latest.jpg'
 
 def writeJPEG(fin,fout):
     I = imread(fin)
