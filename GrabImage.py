@@ -41,7 +41,7 @@ cmd = ['imgcam',
        '-s',str(I_MIN),str(I_MAX),
        '-v']
 
-check_call(cmd,cwd=root)
+check_call(cmd,cwd=str(root))
 
 writeJPEG(FIN,FOUT)
 
