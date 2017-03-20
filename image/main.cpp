@@ -259,7 +259,7 @@ int setupAcq()
     if (i_available) {
       AT_IsWritable(i_handle, L"AOIBinning", &i_available);    
         if (i_available) { 
-          i_err = AT_SetEnumString(Hndl, L"AOIBinning", L"4x4");  
+          i_err = AT_SetEnumString(i_handle, L"AOIBinning", L"4x4");  
           if (errorOk(i_err, "AT_SetEnumString 'AOIBinning'") && b_verbose)
            {
             std::cout << "Set AOIBinning to 4x4" << std::endl;
