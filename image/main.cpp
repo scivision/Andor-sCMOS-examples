@@ -214,6 +214,7 @@ int updateImageSize()
   return i_err;
 }
 
+///////////////////////////////////////////////////////////////////////////////
 int setupAcq()
 {
   int i_err = 0;
@@ -223,6 +224,7 @@ int setupAcq()
   if (errorOk(i_err, "AT_SetInt 'Exposure Time'")) {
   
     int i_available = 0;
+//////////// HEIGHT /////////////////////
     AT_IsImplemented(i_handle, L"AOI Height", &i_available);    
     if (i_available) {
       AT_IsWritable(i_handle, L"AOI Height", &i_available);    
@@ -236,7 +238,7 @@ int setupAcq()
         }
       }
     }
-
+//////////// WIDTH //////////////
     AT_IsImplemented(i_handle, L"AOI Width", &i_available);    
     if (i_available) {
     
@@ -244,14 +246,27 @@ int setupAcq()
       if (i_available) {          
         i_err = AT_GetIntMax(i_handle, L"AOI Width", &i64_aoiWidth);
         if (errorOk(i_err, "AT_GetintMax 'AOI Width'")) {
-          i_err = AT_SetInt(i_handle, L"AOI Width", i64_aoiWidth);    
-          if (errorOk(i_err, "AT_SetInt 'AOI Width'") && b_verbose) {
-            std::cout << "Set AOI Width to " << i64_aoiWidth << std::endl;
-          }      
+          i_err = AT_SetInt(i_handle, L"AOI Width", i64_aoiWidth);
+          if (errorOk(i_err, "AT_SetInt 'AOI Width'") && b_verbose)
+            {
+              std::cout << "Set AOI Width to " << i64_aoiWidth << std::endl;
+            }
         }
       }
     }
-    
+////////// BINNING //////////////////
+    AT_IsImplemented(i_handle, L"AOIBinning", &i_available);
+    if (i_available) {
+      AT_IsWritable(i_handle, L"AOIBinning", &i_available);    
+        if (i_available) { 
+          i_err = AT_SetEnumString(Hndl, L"AOIBinning", L"4x4");  
+          if (errorOk(i_err, "AT_SetEnumString 'AOIBinning'") && b_verbose)
+           {
+            std::cout << "Set AOIBinning to 4x4" << std::endl;
+           }
+         }
+      }
+/////////////// PREAMP //////////////////
     AT_IsImplemented(i_handle, L"SimplePreAmpGainControl", &i_available);
     if (i_available)
     {
