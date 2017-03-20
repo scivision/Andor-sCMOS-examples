@@ -14,14 +14,15 @@ This is a first step.
 """
 from subprocess import check_call
 from scipy.ndimage import imread
-import glymur
+from scipy.misc import imsave
+
 
 EXP_SEC = 1. #exposure
 I_MIN = 100 # intensity minimum for scaling to 8 bit
 I_MAX = 5000 # intensity maximum for scaling to 8 bit -- will saturate on bright aurora!
 
 FIN = 'image.bmp'
-FOUT = 'image.jpf'
+FOUT = 'image.jpg'
 
 cmd = ['imgcam',
        '-e',str(EXP_SEC),
@@ -30,6 +31,13 @@ cmd = ['imgcam',
 
 check_call(cmd)
 
-I = imread(FIN)
+def writeJPEG(fin,fout):
+    I = imread(fin)
+    imsave(fout,I)
 
-glymur.Jp2k(FOUT,I,cratios=[50])
+
+def writeJPEG2000(fin,fout):
+    import glymur
+    I = imread(fin)
+
+    glymur.Jp2k(fout,I,cratios=[50])
