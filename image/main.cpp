@@ -278,7 +278,18 @@ int setupAcq()
            }
          }
       }
-
+////////////// Blemish Filter /////////////
+    AT_IsImplemented(i_handle, L"StaticBlemishCorrection", &i_available);
+    if (i_available) {
+      AT_IsWritable(i_handle, L"StaticBlemishCorrection", &i_available);    
+        if (i_available) { 
+          i_err = AT_SetBool(i_handle, L"StaticBlemishCorrection", b_true);  
+          if (errorOk(i_err, "AT_SetBool 'StaticBlemishCorrection'") && b_verbose)
+           {
+            std::cout << "Set StaticBlemishCorrection ON" << std::endl;
+           }
+         }
+      }
 /////////////// PREAMP //////////////////
     AT_IsImplemented(i_handle, L"SimplePreAmpGainControl", &i_available);
     if (i_available)
