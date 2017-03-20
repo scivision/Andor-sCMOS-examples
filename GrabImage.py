@@ -24,6 +24,16 @@ I_MAX = 5000 # intensity maximum for scaling to 8 bit -- will saturate on bright
 FIN = 'image.bmp'
 FOUT = 'image.jpg'
 
+def writeJPEG(fin,fout):
+    I = imread(fin)
+    imsave(fout,I)
+
+def writeJPEG2000(fin,fout):
+    import glymur
+    I = imread(fin)
+
+    glymur.Jp2k(fout,I,cratios=[50])
+
 cmd = ['imgcam',
        '-e',str(EXP_SEC),
        '-s',str(I_MIN),str(I_MAX),
@@ -33,13 +43,6 @@ check_call(cmd)
 
 writeJPEG(FIN,FOUT)
 
-def writeJPEG(fin,fout):
-    I = imread(fin)
-    imsave(fout,I)
 
 
-def writeJPEG2000(fin,fout):
-    import glymur
-    I = imread(fin)
 
-    glymur.Jp2k(fout,I,cratios=[50])
