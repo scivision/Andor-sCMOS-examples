@@ -419,11 +419,11 @@ int acquire()
       if (errorOk(i_err, "AT_WaitBuffer")) {
         if (puc_returnBuf != puc_image) {
           i_err = -1;
-          std::cout << "Returned buffer not equal to queued buffer" << std::endl;
+          std::cerr << "Returned buffer not equal to queued buffer" << std::endl;
         }
         else if (i64_bufSize != i64_sizeInBytes) {
           i_err = -2;
-          std::cout << "Returned buffer size not correct :  Expected " << i64_sizeInBytes 
+          std::cerr << "Returned buffer size not correct :  Expected " << i64_sizeInBytes 
                     << ", Actual " << i64_bufSize << std::endl;
         }
         else {
@@ -471,5 +471,5 @@ int main(int argc, char ** argv)
     }
     
   }
-  exit(i_err);
+  return i_err;
 }
