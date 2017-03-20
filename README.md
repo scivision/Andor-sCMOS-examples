@@ -1,5 +1,6 @@
 # Andor-sCMOS-examples
 Andor sCMOS (Neo and Zyla) SDK3 examples focused on simplicity and speed.
+Uses C++14 features, which any modern compiler can handle.
 
 ## Prereqs
 You don't have to install Cmake and Make, but they do make compiling easier.

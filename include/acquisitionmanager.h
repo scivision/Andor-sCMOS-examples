@@ -7,6 +7,11 @@
 #define WARN_ON_FAILURE(command) { int result = command; if(result!=AT_SUCCESS) { std::cout<<__LINE__<<"\t: "<<#command<<" returned error code "<<result<<std::endl;} }
 #endif
 
+#include <chrono>
+#include <thread>
+using namespace std;
+using namespace std::literals::chrono_literals;
+
 const int NUMBER_OF_BUFFERS = 1;
 
 class AcquisitionManager {
@@ -53,7 +58,7 @@ public:
     if (!m_cameraPresent) {
       std::cout << "Waiting for camera to reconnect ... " << std::endl;
       while (!m_cameraPresent) {
-        Sleep(100);
+        std::this_thread::sleep_for(100ms);
       }
     }
 

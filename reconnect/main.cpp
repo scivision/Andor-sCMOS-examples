@@ -6,6 +6,10 @@
 #include <sstream>
 #include <vector>
 #include "acquisitionmanager.h"
+#include <chrono>
+#include <thread>
+using namespace std;
+using namespace std::literals::chrono_literals;
 
 #ifndef RETURN_ON_FAILURE
 #define RETURN_ON_FAILURE(command) { int result = command; if(result!=AT_SUCCESS) { std::cout<<__LINE__<<"\t: "<<#command<<" returned error code "<<result<<std::endl; return result;} }
@@ -68,7 +72,7 @@ int run()
     if (imageCount >= IMAGES_TO_ACQUIRE) {
       break;
     }
-    Sleep(400);
+    std::this_thread::sleep_for(400ms);
   }
 
   WARN_ON_FAILURE(manager.StopAcquisition());
