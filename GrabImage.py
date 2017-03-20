@@ -31,6 +31,8 @@ cmd = ['imgcam',
 
 check_call(cmd)
 
+writeJPEG(FIN,FOUT)
+
 def writeJPEG(fin,fout):
     I = imread(fin)
     imsave(fout,I)
