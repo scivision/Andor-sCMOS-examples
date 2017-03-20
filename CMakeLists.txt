@@ -13,5 +13,5 @@ target_link_libraries(listcam atcore)
 #add_executable(reconnect reconnect/main.cpp)
 #target_link_libraries(reconnect atcore)
 
-add_executable(live live/live.cpp)
-target_link_libraries(live atcore)
+add_executable(livecam live/live.cpp)
+target_link_libraries(livecam atcore)

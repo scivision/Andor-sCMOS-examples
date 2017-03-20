@@ -1,6 +1,9 @@
 #include "atcore.h"
 #include <iostream> 
+#include <chrono>
+#include <thread>
 using namespace std;
+using namespace std::literals::chrono_literals;
 
 unsigned char *acqBuffer=NULL;
 unsigned char *acqBuffer1=NULL;
@@ -241,7 +244,7 @@ int performAcquisition(int _handle,int _numberAcquisitions)
   createBuffers(_handle);
 
   AT_Command(_handle, L"AcquisitionStart");
-  Sleep(100); //To Give acquisition time to start
+  std::this_thread::sleep_for(100ms); //To Give acquisition time to start
 
   if (iret ==0) {
     if (doLoopOfAcquisition(_handle,_numberAcquisitions) != 0) {
