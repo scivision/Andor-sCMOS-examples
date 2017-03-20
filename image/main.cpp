@@ -57,7 +57,7 @@ int showHelp()
          "                   unspecified, the max and min of the image is used\n"
          "\n"
          );     
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 int printParams()
@@ -65,7 +65,7 @@ int printParams()
   printf("Device Id: %d\n", i_deviceId);
   printf("Exposure : %0.8f secs\n", d_exposureTime);
   printf("Filename : %s\n", sz_filename); 
-  return 0; 
+  return EXIT_SUCCESS; 
 }
 
 int processArgs(int argc, char ** argv)
@@ -353,7 +353,7 @@ int collectStats(unsigned char * _puc_image, AT_64 _i64_width, AT_64 _i64_height
     std::cout << "Min pixel value     = " << i64_min << std::endl;
     std::cout << "Max pixel value     = " << i64_max << std::endl;    
   }      
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 int acquire()
