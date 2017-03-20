@@ -1,5 +1,3 @@
-
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -28,6 +26,8 @@ AT_64 i64_aoiHeight = 0, i64_aoiWidth = 0;
 
 AT_64 i64_max = 2047;
 AT_64 i64_min = 0;
+
+AT_BOOL b_true = true;
 
 int i_minScale = -1;
 int i_maxScale = -1;
@@ -266,6 +266,19 @@ int setupAcq()
            }
          }
       }
+///////////// Noise Filter ////////////
+    AT_IsImplemented(i_handle, L"SpuriousNoiseFilter", &i_available);
+    if (i_available) {
+      AT_IsWritable(i_handle, L"SpuriousNoiseFilter", &i_available);    
+        if (i_available) { 
+          i_err = AT_SetBool(i_handle, L"SpuriousNoiseFilter", b_true);  
+          if (errorOk(i_err, "AT_SetBool 'SpuriousNoiseFilter'") && b_verbose)
+           {
+            std::cout << "Set SpuriousNoiseFilter ON" << std::endl;
+           }
+         }
+      }
+
 /////////////// PREAMP //////////////////
     AT_IsImplemented(i_handle, L"SimplePreAmpGainControl", &i_available);
     if (i_available)
