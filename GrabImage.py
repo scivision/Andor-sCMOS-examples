@@ -12,17 +12,19 @@ Goal is to make a simple C++ program that does a kinetic series for N hours as c
 through the command line.
 This is a first step.
 """
+from pathlib import Path
 from subprocess import check_call
 from scipy.ndimage import imread
 from scipy.misc import imsave
 
+root = Path(__file__).parents[1]
 
 EXP_SEC = 1. #exposure
 I_MIN = 100 # intensity minimum for scaling to 8 bit
 I_MAX = 5000 # intensity maximum for scaling to 8 bit -- will saturate on bright aurora!
 
 FIN = 'image.bmp'
-FOUT = 'image.jpg'
+FOUT = 'latest.jpg'
 
 def writeJPEG(fin,fout):
     I = imread(fin)
@@ -39,7 +41,7 @@ cmd = ['imgcam',
        '-s',str(I_MIN),str(I_MAX),
        '-v']
 
-check_call(cmd)
+check_call(cmd,cwd=root)
 
 writeJPEG(FIN,FOUT)
 
