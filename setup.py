@@ -1,13 +1,15 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
-req = ['nose','numpy',
+install_requires = ['nose','numpy','imageio',
        'glymur']
 
 setup(name='andor_scmos',
-      packages=['andor_scmos'],
-	  description='Python scripts controlling plain C++. Fast and simple.',
+      packages=find_packages(),
+	  description='Python scripts controlling Andor plain C++. Fast and simple.',
+      long_description=open('README.rst').read(),
 	  url='https://github.com/scivision/andor-scmos-examples',
 	  author='Michael Hirsch, Ph.D.',
-      install_requires=req,
+      install_requires=install_requires,
+      python_requires='>=3.5',
 	  )
 

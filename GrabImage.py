@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Simple script to grab an image from Andor Neo/Zyla. 
+Simple script to grab an image from Andor Neo/Zyla.
 Inefficient yes.
 
 this uses the "imgcam.exe" program that is compiled with Cmake as per the README.
@@ -14,8 +14,7 @@ This is a first step.
 """
 from pathlib import Path
 from subprocess import check_call
-from scipy.ndimage import imread
-from scipy.misc import imsave
+import imageio
 
 root = Path(__file__).parent
 
@@ -27,12 +26,12 @@ FIN = root/'image.bmp'
 FOUT = root/'latest.jpg'
 
 def writeJPEG(fin,fout):
-    I = imread(fin)
-    imsave(fout,I)
+    I = imageio.imread(fin)
+    imageio.imsave(fout,I)
 
 def writeJPEG2000(fin,fout):
     import glymur
-    I = imread(fin)
+    I = imageio.imread(fin)
 
     glymur.Jp2k(fout,I,cratios=[50])
 
