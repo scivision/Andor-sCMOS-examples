@@ -1,8 +1,10 @@
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
-
+#include <time.h>
 #include "atcore.h"
 #include "common.h"
 #include "saveAsBmp.h"
@@ -15,19 +17,27 @@ const int MAX_FILENAME_LENGTH = 256;
 bool b_verbose = false;
 
 char sz_filename[MAX_FILENAME_LENGTH] = "image.bmp";
+char index_sz_filename[MAX_FILENAME_LENGTH + 25];
+
+time_t start,end;
+time_t start1,end1;
+time_t start2,end2;
+time_t start3,end3;
+
+
+
 
 int i_deviceId = 0;
+int i_imagesToCapture = 1;
 
 int i_handle = AT_HANDLE_UNINITIALISED;
 
-double d_exposureTime = 1.;
+double d_exposureTime = 0.05;
 
-AT_64 i64_aoiHeight = 0, i64_aoiWidth = 0;
+AT_64 i64_aoiHeight = 2047, i64_aoiWidth = 2047;
 
 AT_64 i64_max = 2047;
 AT_64 i64_min = 0;
-
-AT_BOOL b_true = true;
 
 int i_minScale = -1;
 int i_maxScale = -1;
@@ -47,6 +57,7 @@ int showHelp()
          "  Captures a single full frame image and saves it to a bitmap.\n"
          "\n"
          "Arguments:\n"
+         "  -n             : How many images in a row to capture. Displays framerate after capture complete. Defaults to 1.\n"
          "  -?             : Show this help\n"
          "  -v/-V          : Verbose mode\n"
          "  -e <exptime>   : Sets the exposure to the specified float value\n"
@@ -57,7 +68,7 @@ int showHelp()
          "                   unspecified, the max and min of the image is used\n"
          "\n"
          );     
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 int printParams()
@@ -65,7 +76,7 @@ int printParams()
   printf("Device Id: %d\n", i_deviceId);
   printf("Exposure : %0.8f secs\n", d_exposureTime);
   printf("Filename : %s\n", sz_filename); 
-  return EXIT_SUCCESS; 
+  return 0; 
 }
 
 int processArgs(int argc, char ** argv)
@@ -87,6 +98,16 @@ int processArgs(int argc, char ** argv)
     }
 
     switch (sz_current[1]) {
+    case 'n':
+      if (argc > 1) {
+        argc--;
+        argv++;
+        i_imagesToCapture = atoi(*argv);
+      }
+      else {
+        i_err = -4;
+        printf("No number of images given. \n");
+      }
     case '?':
       showHelp();
       break;      
@@ -214,7 +235,6 @@ int updateImageSize()
   return i_err;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 int setupAcq()
 {
   int i_err = 0;
@@ -224,7 +244,6 @@ int setupAcq()
   if (errorOk(i_err, "AT_SetInt 'Exposure Time'")) {
   
     int i_available = 0;
-//////////// HEIGHT /////////////////////
     AT_IsImplemented(i_handle, L"AOI Height", &i_available);    
     if (i_available) {
       AT_IsWritable(i_handle, L"AOI Height", &i_available);    
@@ -238,7 +257,7 @@ int setupAcq()
         }
       }
     }
-//////////// WIDTH //////////////
+
     AT_IsImplemented(i_handle, L"AOI Width", &i_available);    
     if (i_available) {
     
@@ -246,51 +265,14 @@ int setupAcq()
       if (i_available) {          
         i_err = AT_GetIntMax(i_handle, L"AOI Width", &i64_aoiWidth);
         if (errorOk(i_err, "AT_GetintMax 'AOI Width'")) {
-          i_err = AT_SetInt(i_handle, L"AOI Width", i64_aoiWidth);
-          if (errorOk(i_err, "AT_SetInt 'AOI Width'") && b_verbose)
-            {
-              std::cout << "Set AOI Width to " << i64_aoiWidth << std::endl;
-            }
+          i_err = AT_SetInt(i_handle, L"AOI Width", i64_aoiWidth);    
+          if (errorOk(i_err, "AT_SetInt 'AOI Width'") && b_verbose) {
+            std::cout << "Set AOI Width to " << i64_aoiWidth << std::endl;
+          }      
         }
       }
     }
-////////// BINNING //////////////////
-    AT_IsImplemented(i_handle, L"AOIBinning", &i_available);
-    if (i_available) {
-      AT_IsWritable(i_handle, L"AOIBinning", &i_available);    
-        if (i_available) { 
-          i_err = AT_SetEnumString(i_handle, L"AOIBinning", L"4x4");  
-          if (errorOk(i_err, "AT_SetEnumString 'AOIBinning'") && b_verbose)
-           {
-            std::cout << "Set AOIBinning to 4x4" << std::endl;
-           }
-         }
-      }
-///////////// Noise Filter ////////////
-    AT_IsImplemented(i_handle, L"SpuriousNoiseFilter", &i_available);
-    if (i_available) {
-      AT_IsWritable(i_handle, L"SpuriousNoiseFilter", &i_available);    
-        if (i_available) { 
-          i_err = AT_SetBool(i_handle, L"SpuriousNoiseFilter", b_true);  
-          if (errorOk(i_err, "AT_SetBool 'SpuriousNoiseFilter'") && b_verbose)
-           {
-            std::cout << "Set SpuriousNoiseFilter ON" << std::endl;
-           }
-         }
-      }
-////////////// Blemish Filter /////////////
-    AT_IsImplemented(i_handle, L"StaticBlemishCorrection", &i_available);
-    if (i_available) {
-      AT_IsWritable(i_handle, L"StaticBlemishCorrection", &i_available);    
-        if (i_available) { 
-          i_err = AT_SetBool(i_handle, L"StaticBlemishCorrection", b_true);  
-          if (errorOk(i_err, "AT_SetBool 'StaticBlemishCorrection'") && b_verbose)
-           {
-            std::cout << "Set StaticBlemishCorrection ON" << std::endl;
-           }
-         }
-      }
-/////////////// PREAMP //////////////////
+    
     AT_IsImplemented(i_handle, L"SimplePreAmpGainControl", &i_available);
     if (i_available)
     {
@@ -392,55 +374,82 @@ int collectStats(unsigned char * _puc_image, AT_64 _i64_width, AT_64 _i64_height
     std::cout << "Min pixel value     = " << i64_min << std::endl;
     std::cout << "Max pixel value     = " << i64_max << std::endl;    
   }      
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 int acquire()
 {
+  double accum1 = 0;
+  
   int i_err = 0;
-  AT_64 i64_sizeInBytes, i64_aoiStride;
+   AT_64 i64_sizeInBytes, i64_aoiStride;
+  
   AT_GetInt(i_handle, L"ImageSizeBytes", &i64_sizeInBytes);
   AT_GetInt(i_handle, L"AOIStride", &i64_aoiStride);
   
-  unsigned char * puc_image = new unsigned char[i64_sizeInBytes];
   
-  i_err = AT_QueueBuffer(i_handle, puc_image, i64_sizeInBytes);
+  //Declare the number of buffers and the number of frames interested in
+  int NumberOfBuffers = 250;
+  int NumberOfFrames = i_imagesToCapture;
+  //Allocate a number of memory buffers to store frames
+  unsigned char** AcqBuffers = new unsigned char*[NumberOfBuffers];
+  unsigned char** AlignedBuffers = new unsigned char*[NumberOfBuffers];
+  for (int i=0; i < NumberOfBuffers; i++) {
+   AcqBuffers[i] = new unsigned char[i64_sizeInBytes + 7];
+   AlignedBuffers[i] = reinterpret_cast<unsigned char*>((reinterpret_cast<unsigned
+  long>(AcqBuffers[i% NumberOfBuffers]) + 7) & ~7);
+  }
+  //Pass these buffers to the SDK
+  for(int i=0; i < NumberOfBuffers; i++) {
+   i_err = AT_QueueBuffer(i_handle, AlignedBuffers[i], i64_sizeInBytes);
+  }
   if (errorOk(i_err, "AT_QueueBuffer")) {
+    //Set the camera to continuously acquires frames
+    AT_SetEnumString(i_handle, L"CycleMode", L"Continuous");
+
+    time (&start);
     i_err = AT_Command(i_handle, L"Acquisition Start");
     if (errorOk(i_err, "AT_Command 'Acquisition Start'")) {
-      unsigned char * puc_returnBuf = NULL;
-      int i64_bufSize = 0;
-      unsigned int ui_timeout = static_cast<unsigned int>(3 * d_exposureTime * 1000);
-      if (ui_timeout < 500) {
-        ui_timeout = 500;
-      }
+      //Sleep in this thread until data is ready, in this case set
+      //the timeout to infinite for simplicity
+      unsigned char* pBuf;
+      int BufSize;
+      for (int i=0; i < NumberOfFrames; i++) {
+        time (&start1);
+        i_err = AT_WaitBuffer(i_handle, &pBuf, &BufSize, AT_INFINITE);
+        //Application specific data processing goes here..
+        snprintf(index_sz_filename,sizeof(index_sz_filename),"%d_%s",i, sz_filename);
+        saveAsBmp(index_sz_filename, pBuf, i64_aoiWidth, i64_aoiHeight, i64_aoiStride, i_minScale, i_maxScale);
       
-      i_err = AT_WaitBuffer(i_handle, &puc_returnBuf, &i64_bufSize, ui_timeout);
-      if (errorOk(i_err, "AT_WaitBuffer")) {
-        if (puc_returnBuf != puc_image) {
-          i_err = -1;
-          std::cerr << "Returned buffer not equal to queued buffer" << std::endl;
-        }
-        else if (i64_bufSize != i64_sizeInBytes) {
-          i_err = -2;
-          std::cerr << "Returned buffer size not correct :  Expected " << i64_sizeInBytes 
-                    << ", Actual " << i64_bufSize << std::endl;
-        }
-        else {
-          collectStats(puc_returnBuf, i64_aoiWidth, i64_aoiHeight, i64_aoiStride);
-          if (i_minScale < 0) {
-            i_minScale = i64_min;
-            i_maxScale = i64_max;
-          }
-          saveAsBmp(sz_filename, puc_returnBuf, i64_aoiWidth, i64_aoiHeight, i64_aoiStride, i_minScale, i_maxScale);
-        }
+        //Re-queue the buffers
+        AT_QueueBuffer(i_handle, AlignedBuffers[i%NumberOfBuffers], i64_sizeInBytes);
+        
+        time (&end1);
+        accum1 += difftime(end1,start1);
+
       }
+      //Stop the acquisition
+      AT_Command(i_handle, L"AcquisitionStop");
+      AT_Flush(i_handle); 
+
+
+      //Application specific data processing goes here..
+      //Free the allocated buffer
+      for (int i=0; i < NumberOfBuffers; i++) {
+       delete[] AcqBuffers[i];
+      }
+      delete[] AlignedBuffers;
+      delete[] AcqBuffers;
+   
     }
-    AT_Command(i_handle, L"AcquisitionStop");
-    AT_Flush(i_handle);
-  } 
-  
-  delete [] puc_image;
+  }
+
+  time (&end);
+  double dif = i_imagesToCapture/difftime(end,start);
+  printf ("Loop 1 framerate is %lf hz for %d images.\n", dif, i_imagesToCapture);
+  double dif1 = i_imagesToCapture/accum1;
+  printf ("saveAsBmp 1 framerate is %lf hz for %d images.\n", dif1, i_imagesToCapture);
+
   return i_err;
 }
 
@@ -471,5 +480,5 @@ int main(int argc, char ** argv)
     }
     
   }
-  return i_err;
+  exit(i_err);
 }

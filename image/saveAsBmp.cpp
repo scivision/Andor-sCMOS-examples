@@ -5,10 +5,10 @@
 
 using namespace std;
 
-const int MIN_COLOR = 28;
-const int MAX_COLOR = 227;
+const int MIN_COLOR = 02000;
+const int MAX_COLOR = 62000;
 
-const int COLOR_RANGE = 256;
+const int COLOR_RANGE = 65536;
 
 #pragma pack(push,1)
 typedef struct {
@@ -54,7 +54,7 @@ int saveAsBmp(char * _sz_filename, unsigned char * _puc_data, int _width, int _h
 
 		bmp.id1 = 'B';
 		bmp.id2 = 'M';
-		bmp.bits 					  = 8;
+		bmp.bits 					  = 16;
 		bmp.headersize 			= 1078L;
 		bmp.filesize 		   	= bmp.headersize + (unsigned int) falseXRange * _height * sizeof(unsigned char);
 		bmp.reserved[0]     = bmp.reserved[1] = 0;
