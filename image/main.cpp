@@ -5,6 +5,8 @@
 #include <string.h>
 #include <iostream>
 #include <time.h>
+#include "atutility.h"
+
 #include "atcore.h"
 #include "common.h"
 #include "saveAsBmp.h"
@@ -24,7 +26,8 @@ time_t start1,end1;
 time_t start2,end2;
 time_t start3,end3;
 
-
+bool b_set16bit = true; // defaults to 16 bit, settings are for 12 bit if false.
+  
 
 
 int i_deviceId = 0;
@@ -57,6 +60,7 @@ int showHelp()
          "  Captures a single full frame image and saves it to a bitmap.\n"
          "\n"
          "Arguments:\n"
+         "  -P             : Whether or not to use 12bit packed bit mode on camera for faster frame rates. Defaults to using 16 bit mode.\n"
          "  -n             : How many images in a row to capture. Displays framerate after capture complete. Defaults to 1.\n"
          "  -?             : Show this help\n"
          "  -v/-V          : Verbose mode\n"
@@ -98,6 +102,15 @@ int processArgs(int argc, char ** argv)
     }
 
     switch (sz_current[1]) {
+    
+
+    case '?':
+      showHelp();
+      break;      
+    case 'v':
+    case 'V':
+      b_verbose = true;
+      break;
     case 'n':
       if (argc > 1) {
         argc--;
@@ -108,12 +121,9 @@ int processArgs(int argc, char ** argv)
         i_err = -4;
         printf("No number of images given. \n");
       }
-    case '?':
-      showHelp();
-      break;      
-    case 'v':
-    case 'V':
-      b_verbose = true;
+      break;
+    case 'P':
+      b_set16bit = false;
       break;
     case 'e':
       if (argc > 1) {
@@ -188,6 +198,9 @@ int init()
   int i_err = 0;
   i_err = AT_InitialiseLibrary();
   if (errorOk(i_err, "AT_InitialiseLibrary")) {
+    //Open utility library used in 12 bit mode:
+    AT_InitialiseUtilityLibrary();
+
     if (b_verbose) {
       AT_64 i64_deviceCount = 0;
       i_err = AT_GetInt(AT_HANDLE_SYSTEM, L"Device Count", &i64_deviceCount);
@@ -210,6 +223,9 @@ int shutdown()
 
   i_err = AT_FinaliseLibrary();
   errorOk(i_err, "AT_FinaliseLibrary");  
+  i_err = AT_FinaliseUtilityLibrary();
+  errorOk(i_err, "AT_FinaliseUtilityLibrary");  
+  
   return i_err;
 }
 
@@ -238,7 +254,6 @@ int updateImageSize()
 int setupAcq()
 {
   int i_err = 0;
-  bool b_set16bit = false;
   
   i_err = AT_SetFloat(i_handle, L"Exposure Time", d_exposureTime);
   if (errorOk(i_err, "AT_SetInt 'Exposure Time'")) {
@@ -276,17 +291,23 @@ int setupAcq()
     AT_IsImplemented(i_handle, L"SimplePreAmpGainControl", &i_available);
     if (i_available)
     {
+      if (b_set16bit){
       i_err = AT_SetEnumString(i_handle, L"SimplePreAmpGainControl", L"16-bit (low noise & high well capacity)");  
       if (errorOk(i_err, "AT_SetEnumString 'SimplePreAmpGainControl'")) {
         if (b_verbose) {
           std::cout << "Set SimplePreAmpGainControl to " <<  "16-bit (low noise & high well capacity)" << std::endl;
         }
-        b_set16bit = true;
+       }
+     } else { //Setup for 12 bit low noise
+          i_err = AT_SetEnumString(i_handle, L"SimplePreAmpGainControl", L"12-bit (low noise)");  
+          if (errorOk(i_err, "AT_SetEnumString 'SimplePreAmpGainControl'")) {
+                  if (b_verbose) {
+                    std::cout << "Set SimplePreAmpGainControl to " <<  "12-bit (low noise)" << std::endl;
+                  }
+                  
+                }
       }
-      else {
-        b_set16bit = false;
-      }
-        
+      
     }
     
     AT_IsImplemented(i_handle, L"PixelEncoding", &i_available);    
@@ -386,11 +407,16 @@ int acquire()
   
   AT_GetInt(i_handle, L"ImageSizeBytes", &i64_sizeInBytes);
   AT_GetInt(i_handle, L"AOIStride", &i64_aoiStride);
+  updateImageSize();
   
   
   //Declare the number of buffers and the number of frames interested in
   int NumberOfBuffers = 250;
   int NumberOfFrames = i_imagesToCapture;
+
+  //Reserved temp buffer for 12 bit mode:
+  unsigned short* unpackedBuffer = new unsigned short[static_cast<size_t>(i64_aoiWidth* i64_aoiHeight)];
+            
   //Allocate a number of memory buffers to store frames
   unsigned char** AcqBuffers = new unsigned char*[NumberOfBuffers];
   unsigned char** AlignedBuffers = new unsigned char*[NumberOfBuffers];
@@ -419,8 +445,16 @@ int acquire()
         i_err = AT_WaitBuffer(i_handle, &pBuf, &BufSize, AT_INFINITE);
         //Application specific data processing goes here..
         snprintf(index_sz_filename,sizeof(index_sz_filename),"%d_%s",i, sz_filename);
-        saveAsBmp(index_sz_filename, pBuf, i64_aoiWidth, i64_aoiHeight, i64_aoiStride, i_minScale, i_maxScale);
+        
+        if (b_set16bit){
+        
+          saveAsBmp(index_sz_filename, pBuf, i64_aoiWidth, i64_aoiHeight, i64_aoiStride, i_minScale, i_maxScale);
       
+        } else {
+          //AT_ConvertBuffer(pBuf, reinterpret_cast<unsigned char*>(unpackedBuffer), i64_aoiWidth, i64_aoiHeight, i64_aoiStride, L"Mono12Packed", L"Mono16");
+          //saveAsBmp(index_sz_filename, reinterpret_cast<unsigned char*>(&unpackedBuffer), i64_aoiWidth, i64_aoiHeight, i64_aoiStride, i_minScale, i_maxScale);
+
+        }
         //Re-queue the buffers
         AT_QueueBuffer(i_handle, AlignedBuffers[i%NumberOfBuffers], i64_sizeInBytes);
         
@@ -450,6 +484,8 @@ int acquire()
   double dif1 = i_imagesToCapture/accum1;
   printf ("saveAsBmp 1 framerate is %lf hz for %d images.\n", dif1, i_imagesToCapture);
 
+  //delete[] unpackedBuffer;
+      
   return i_err;
 }
 
