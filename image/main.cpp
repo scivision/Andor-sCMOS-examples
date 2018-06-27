@@ -11,6 +11,7 @@
 #include "common.h"
 #include "saveAsBmp.h"
 
+
 //************************************
 //*** Data
 //************************************
@@ -414,8 +415,7 @@ int acquire()
   int NumberOfBuffers = 250;
   int NumberOfFrames = i_imagesToCapture;
 
-  //Reserved temp buffer for 12 bit mode:
-  unsigned short* unpackedBuffer = new unsigned short[static_cast<size_t>(i64_aoiWidth* i64_aoiHeight)];
+
             
   //Allocate a number of memory buffers to store frames
   unsigned char** AcqBuffers = new unsigned char*[NumberOfBuffers];
@@ -451,8 +451,14 @@ int acquire()
           saveAsBmp(index_sz_filename, pBuf, i64_aoiWidth, i64_aoiHeight, i64_aoiStride, i_minScale, i_maxScale);
       
         } else {
-          //AT_ConvertBuffer(pBuf, reinterpret_cast<unsigned char*>(unpackedBuffer), i64_aoiWidth, i64_aoiHeight, i64_aoiStride, L"Mono12Packed", L"Mono16");
-          //saveAsBmp(index_sz_filename, reinterpret_cast<unsigned char*>(&unpackedBuffer), i64_aoiWidth, i64_aoiHeight, i64_aoiStride, i_minScale, i_maxScale);
+          //Reserved temp buffer for 12 bit mode:
+          unsigned short* unpackedBuffer = new unsigned short[static_cast<size_t>(i64_aoiWidth* i64_aoiHeight)];
+          unsigned char* unpackedBufferPtr = reinterpret_cast<unsigned char*>(&(unpackedBuffer[0]));
+          
+          AT_ConvertBuffer(pBuf, reinterpret_cast<unsigned char*>(unpackedBuffer), i64_aoiWidth, i64_aoiHeight, i64_aoiStride, L"Mono12Packed", L"Mono16");
+        
+
+          saveAsBmp(index_sz_filename, unpackedBufferPtr, i64_aoiWidth, i64_aoiHeight, i64_aoiStride, i_minScale, i_maxScale);
 
         }
         //Re-queue the buffers
