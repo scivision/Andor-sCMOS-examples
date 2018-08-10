@@ -6,11 +6,11 @@ A bonus Python script is included that polls the C++ image.exe for an image, an 
 Yes that could be done with ctypes, pyAndorNeo, etc. but my goal is always simplicity and expediency.
 
 ## Prereqs
-You don't have to install Cmake and Make, but they do make compiling easier.
 
 ### Windows
 step 4 is necessary because not all compilers understand how to link the `.dll` files directly; the `.lib` act as a shim to the `.dll`.
 
+0. Install [Cmake](https://cmake.org/download/) (the `.msi` file) and [MinGW compilers](https://www.scivision.co/windows-gcc-gfortran-cmake-make-install/)
 1. clone this repository
 2. [install Andor SDK3 for Windows](https://www.scivision.co/andor-neo-windows-sdk3-install/)
 3. copy from `c:/Program Files/Andor SDK3/` directory into `andor-scmos-examples/lib/` the files
@@ -24,19 +24,19 @@ step 4 is necessary because not all compilers understand how to link the `.dll` 
    rename atcorem.lib atcore.lib
    rename atutilitym.lib atutility.lib
    ```
-5. (optional) install [Cmake](https://cmake.org/download/) (the `.msi` file)
 
 ### Linux
 I use Andor cameras with Ubuntu 16.04. 
 Other Linux versions would likely work as well.
 I do NOT expect that Windows Subsystem for Linux would work, but have not tried it.
 
-1. clone this repository
-2. install [Andor SDK3 for Linux](https://www.scivision.co/andor-neo-linux-sdk3-install/)
-3. install Cmake & Make
+0. prereqs
    ```sh
    apt install cmake make g++
    ```
+1. clone this repository
+2. install [Andor SDK3 for Linux](https://www.scivision.co/andor-neo-linux-sdk3-install/)
+
    
 ## Compile Andor sCMOS example programs
 
