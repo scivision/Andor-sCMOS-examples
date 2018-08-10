@@ -1,4 +1,4 @@
-# Andor-sCMOS-examples
+# Andor sCMOS examples
 Andor sCMOS (Neo and Zyla) SDK3 examples focused on simplicity and speed.
 Uses C++14 features, which any modern compiler can handle.
 
@@ -20,11 +20,11 @@ step 4 is necessary because not all compilers understand how to link the `.dll` 
         atutilitym.lib
         atutility.dll
 4. in `andor-scmos-examples/lib`
-
-        rename atcorem.lib atcore.lib
-        rename atutilitym.lib atutility.lib
+   ```posh
+   rename atcorem.lib atcore.lib
+   rename atutilitym.lib atutility.lib
+   ```
 5. (optional) install [Cmake](https://cmake.org/download/) (the `.msi` file)
-6. (optional) install [Make](https://sourceforge.net/projects/mingw/) all you need is under All Packages > `mingw32-make`
 
 ### Linux
 I use Andor cameras with Ubuntu 16.04. 
@@ -32,26 +32,25 @@ Other Linux versions would likely work as well.
 I do NOT expect that Windows Subsystem for Linux would work, but have not tried it.
 
 1. clone this repository
-2. [install Andor SDK3 for Linux](https://www.scivision.co/andor-neo-linux-sdk3-install/)
+2. install [Andor SDK3 for Linux](https://www.scivision.co/andor-neo-linux-sdk3-install/)
 3. install Cmake & Make
-
-        apt install cmake make g++
-
+   ```sh
+   apt install cmake make g++
+   ```
+   
 ## Compile Andor sCMOS example programs
 
 from the `andor-cmos-examples` directory
 
-### Linux compile
+```sh
+cd bin
 
-    cmake .
-    make
+cmake ..   # mac, linux
+cmake -G "MinGW Makefiles" ..   # windows
 
-### Window compile
+cmake --build .
+```
 
-    cmake -G "MinGW Makefiles" .
-    mingw32-make
-
-this creates executable in the same top-level directory.
 If you don't have a camera, the SimCam will be used.
 
 ## Example programs
