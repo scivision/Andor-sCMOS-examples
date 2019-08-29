@@ -10,9 +10,9 @@ Yes that could be done with ctypes, pyAndorNeo, etc. but my goal is always simpl
 ### Windows
 step 4 is necessary because not all compilers understand how to link the `.dll` files directly; the `.lib` act as a shim to the `.dll`.
 
-0. Install [Cmake](https://cmake.org/download/) (the `.msi` file) and [MinGW compilers](https://www.scivision.co/windows-gcc-gfortran-cmake-make-install/)
+0. Install [Cmake](https://cmake.org/download/) (the `.msi` file) and [MinGW compilers](https://www.scivision.dev/windows-gcc-gfortran-cmake-make-install/)
 1. clone this repository
-2. [install Andor SDK3 for Windows](https://www.scivision.co/andor-neo-windows-sdk3-install/)
+2. [install Andor SDK3 for Windows](https://www.scivision.dev/andor-neo-windows-sdk3-install/)
 3. copy from `c:/Program Files/Andor SDK3/` directory into `andor-scmos-examples/lib/` the files
 
         atcorem.lib
@@ -35,7 +35,7 @@ I do NOT expect that Windows Subsystem for Linux would work, but have not tried 
    apt install cmake make g++
    ```
 1. clone this repository
-2. install [Andor SDK3 for Linux](https://www.scivision.co/andor-neo-linux-sdk3-install/)
+2. install [Andor SDK3 for Linux](https://www.scivision.dev/andor-neo-linux-sdk3-install/)
 
    
 ## Compile Andor sCMOS example programs
